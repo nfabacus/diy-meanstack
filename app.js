@@ -1,6 +1,6 @@
 var express = require('express');
 // var request = require('request');
-var nodemailer = require('nodemailer');
+
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -8,7 +8,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 
-require('dotenv').config();
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var postContact = require('./routes/postContact');

@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
-
+var nodemailer = require('nodemailer');
+require('dotenv').config();
 var myPassword = process.env.myPassword;
 var myEmail = process.env.myEmail;
 var myContactEmail = process.env.myContactEmail;
 
 /* POST details from contact form */
-router.post('/postContact', function (req, res, next) {
+router.post('/', function (req, res, next) {
 
   var name = req.body.name;
   var email = req.body.email;
