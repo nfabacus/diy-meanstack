@@ -1,2 +1,2 @@
 require("./stylesheets/styles.scss");
-require("./angularApp.js");
+require("./javascripts/angularApp.js");
