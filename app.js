@@ -6,6 +6,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+
+var mongoose = require('mongoose');
+// We need to require monoose models here.
+require('./models/Todos.js');
+mongoose.connect('mongodb://localhost/diy-meanstack');
+
+
 var expressValidator = require('express-validator');
 
 var routes = require('./routes/index');

@@ -4,52 +4,6 @@ require('angular-animate');
 
 var app = angular.module('myApp',['ngAnimate', 'ui.router']);
 
-app.config(function($stateProvider, $urlRouterProvider, $compileProvider, $httpProvider, $locationProvider){
-  delete $httpProvider.defaults.headers.common["X-Requested-With"];
-  $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|local|data|chrome-extension):/);
-
-  $urlRouterProvider.otherwise('/');
-
-  $stateProvider
-    .state('landing', {
-      url:'/',
-      templateUrl: 'static/landing.html',
-      controller: 'landingCtrl as landCtrl'
-    })
-    .state('home', {
-      url:'/home',
-      templateUrl: 'static/pages.html',
-      controller: 'pageCtrl as pCtrl'
-    })
-    .state('homeSections', {
-      url:'/home/:itemUrl',
-      templateUrl: 'static/pages.html',
-      controller: 'pageCtrl as pCtrl'
-    })
-    .state('about', {
-      url:'/about',
-      templateUrl: 'static/pages.html',
-      controller: 'pageCtrl as pCtrl'
-    })
-    .state('aboutSections', {
-      url:'/about/:itemUrl',
-      templateUrl: 'static/pages.html',
-      controller: 'pageCtrl as pCtrl'
-    })
-    .state('image-gallery', {
-      url:'/image-gallery',
-      templateUrl: 'static/image-gallery.html',
-      controller: 'imageGalleryCtrl as igCtrl'
-    })
-    .state('contact', {
-      url:'/contact',
-      templateUrl: 'static/contact.html',
-      controller: 'contactCtrl as cCtrl'
-    });
-  $locationProvider.html5Mode(true);
-
-});
-
 app.factory('pages', function(){
   var o = {};
 
@@ -136,6 +90,43 @@ app.factory('pages', function(){
   return o;
 });
 
+app.factory('toDos', ['$http', '$q', function($http, $q){
+  var o = {
+    todos:[]
+  };
+  o.getAll = function() {
+    var deferred = $q.defer();
+    $http.get('/todos.json').then(function(res){
+      deferred.resolve(res.data);
+        },function(err){
+      deferred.reject();
+      console.log("error", err);
+    });
+    return deferred.promise;
+  };
+
+  o.addTodo = function(item){
+    var deferred = $q.defer();
+    $http.post('/todos.json', item).then(function(res){
+      deferred.resolve(res.data);
+        },function(err){
+      deferred.reject();
+      console.log("error", err);
+    });
+    return deferred.promise;
+  };
+
+  o.deleteTodo = function(item){
+    o.todos.forEach(function(todo, index){
+      if(item.id === todo.id){
+        o.todos.splice(index,1);
+      }
+    });
+  };
+
+  return o;
+}]);
+
 app.controller('mainCtrl', function($scope){
   $scope.parent = {};
   $scope.parent.addClass = "";
@@ -144,6 +135,60 @@ app.controller('mainCtrl', function($scope){
 app.controller('landingCtrl', function($scope){
   $scope.parent.addClass = "landingBackground";
 });
+
+app.controller('todoCtrl', ['$scope', 'toDos', function($scope, toDos){
+    $scope.updateTodos = function(){
+    toDos.getAll().then(
+      function(res){ //success
+        console.log("data response: ", res);
+        toDos.todos = res;
+        $scope.todoList = toDos.todos;
+        console.log('todoList updated: ', $scope.todoList);
+
+      },
+      function(status){ //error
+        self.apiError = true;
+        self.apiStatus = status;
+      }
+    );
+
+  };
+  console.log('todoList: ', $scope.todoList);
+  $scope.updateTodos();
+
+  $scope.submit = function(){
+    if(!$scope.todoText){
+      return;
+    }
+    console.log("$scope.todoText: ", $scope.todoText);
+    toDos.addTodo({
+      text: $scope.todoText,
+      complete: false
+    }).then(
+      function(res){ //success
+        console.log("data response from addTodo: ", res);
+        toDos.todos.push(res);
+        $scope.todoList = toDos.todos;
+        // console.log('todoList updated: ', $scope.todoList);
+
+      },
+      function(status){ //error
+        self.apiError = true;
+        self.apiStatus = status;
+      }
+    );
+
+
+
+
+
+    $scope.todoText = "";
+  };
+  $scope.delete = function(item){
+    toDos.deleteTodo(item);
+  };
+
+}]);
 
 app.controller('pageCtrl', ['$scope', '$state', '$stateParams', 'pages', '$location', function($scope, $state, $stateParams, pages, $location){
 
@@ -227,6 +272,55 @@ app.controller('contactCtrl', ['$scope', '$state', '$stateParams', 'pages', '$ht
     });
 
   };
-
-
 }]);
+
+app.config(function($stateProvider, $urlRouterProvider, $compileProvider, $httpProvider, $locationProvider){
+  delete $httpProvider.defaults.headers.common["X-Requested-With"];
+  $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|local|data|chrome-extension):/);
+
+  $urlRouterProvider.otherwise('/');
+
+  $stateProvider
+    .state('landing', {
+      url:'/',
+      templateUrl: 'static/landing.html',
+      controller: 'landingCtrl as landCtrl'
+    })
+    .state('home', {
+      url:'/home',
+      templateUrl: 'static/pages.html',
+      controller: 'pageCtrl as pCtrl'
+    })
+    .state('homeSections', {
+      url:'/home/:itemUrl',
+      templateUrl: 'static/pages.html',
+      controller: 'pageCtrl as pCtrl'
+    })
+    .state('about', {
+      url:'/about',
+      templateUrl: 'static/pages.html',
+      controller: 'pageCtrl as pCtrl'
+    })
+    .state('aboutSections', {
+      url:'/about/:itemUrl',
+      templateUrl: 'static/pages.html',
+      controller: 'pageCtrl as pCtrl'
+    })
+    .state('todos', {
+      url: '/todos',
+      templateUrl: 'static/todos.html',
+      controller: 'todoCtrl as tdCtrl'
+    })
+    .state('image-gallery', {
+      url:'/image-gallery',
+      templateUrl: 'static/image-gallery.html',
+      controller: 'imageGalleryCtrl as igCtrl'
+    })
+    .state('contact', {
+      url:'/contact',
+      templateUrl: 'static/contact.html',
+      controller: 'contactCtrl as cCtrl'
+    });
+  $locationProvider.html5Mode(true);
+
+});
