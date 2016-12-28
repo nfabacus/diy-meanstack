@@ -90,38 +90,35 @@ app.factory('pages', function(){
   return o;
 });
 
-app.factory('toDos', ['$http', '$q', function($http, $q){
+app.factory('toDos', ['$http', function($http){
   var o = {
     todos:[]
   };
   o.getAll = function() {
-    var deferred = $q.defer();
-    $http.get('/todos.json').then(function(res){
-      deferred.resolve(res.data);
-        },function(err){
-      deferred.reject();
-      console.log("error", err);
+    return $http.get('/todos.json').then(function(res){
+      angular.copy(res.data, o.todos);
     });
-    return deferred.promise;
   };
 
   o.addTodo = function(item){
-    var deferred = $q.defer();
-    $http.post('/todos.json', item).then(function(res){
-      deferred.resolve(res.data);
-        },function(err){
-      deferred.reject();
-      console.log("error", err);
+    return $http.post('/todos.json', item).then(function(res){
+      console.log("data response from addTodo: ", res.data);
+      o.todos.push(res.data);
     });
-    return deferred.promise;
   };
 
-  o.deleteTodo = function(item){
-    o.todos.forEach(function(todo, index){
-      if(item.id === todo.id){
-        o.todos.splice(index,1);
-      }
+  o.delete = function(todo){
+    console.log("deteTodo executed");
+    return $http.delete('/todos.json/' + todo._id).then(function(res){
+      console.log("res.data from delete: ", res.data);
+
+      o.todos.forEach(function(item, index){
+        if (item._id === res.data){
+          o.todos.splice(index, 1);
+        }
+      });
     });
+
   };
 
   return o;
@@ -137,24 +134,12 @@ app.controller('landingCtrl', function($scope){
 });
 
 app.controller('todoCtrl', ['$scope', 'toDos', function($scope, toDos){
-    $scope.updateTodos = function(){
-    toDos.getAll().then(
-      function(res){ //success
-        console.log("data response: ", res);
-        toDos.todos = res;
-        $scope.todoList = toDos.todos;
-        console.log('todoList updated: ', $scope.todoList);
-
-      },
-      function(status){ //error
-        self.apiError = true;
-        self.apiStatus = status;
-      }
-    );
-
-  };
-  console.log('todoList: ', $scope.todoList);
-  $scope.updateTodos();
+  // $scope.updateTodos = function(){
+      $scope.todoList = toDos.todos;
+      console.log('todoList updated: ', $scope.todoList);
+  // };
+  // console.log('todoList: ', $scope.todoList);
+  // $scope.updateTodos();
 
   $scope.submit = function(){
     if(!$scope.todoText){
@@ -164,28 +149,12 @@ app.controller('todoCtrl', ['$scope', 'toDos', function($scope, toDos){
     toDos.addTodo({
       text: $scope.todoText,
       complete: false
-    }).then(
-      function(res){ //success
-        console.log("data response from addTodo: ", res);
-        toDos.todos.push(res);
-        $scope.todoList = toDos.todos;
-        // console.log('todoList updated: ', $scope.todoList);
-
-      },
-      function(status){ //error
-        self.apiError = true;
-        self.apiStatus = status;
-      }
-    );
-
-
-
-
+    });
 
     $scope.todoText = "";
   };
-  $scope.delete = function(item){
-    toDos.deleteTodo(item);
+  $scope.deleteTodo = function(todo){
+    toDos.delete(todo);
   };
 
 }]);
@@ -228,6 +197,7 @@ app.controller('contactCtrl', ['$scope', '$state', '$stateParams', 'pages', '$ht
 
   $scope.submit = function(){
 
+    // Front end input validations can be built if necessary...
     // if(!$scope.name || $scope.name ==='') {
     //   return;
     // }
@@ -309,7 +279,12 @@ app.config(function($stateProvider, $urlRouterProvider, $compileProvider, $httpP
     .state('todos', {
       url: '/todos',
       templateUrl: 'static/todos.html',
-      controller: 'todoCtrl as tdCtrl'
+      controller: 'todoCtrl as tdCtrl',
+      resolve: {
+        postPromise: ['toDos', function(toDos){
+          return toDos.getAll();
+        }]
+      }
     })
     .state('image-gallery', {
       url:'/image-gallery',
