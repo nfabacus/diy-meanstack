@@ -11,7 +11,7 @@
     "start": "node ./bin/www",
     "dev": "NODE_PATH=$NODE_PATH:./src nodemon ./bin/www & webpack-dev-server --progress --colors",
     "build": "webpack --progress --colors --config webpack.prod.config.js"
-    },
+  },
   "author": "Noby Fujioka",
   "dependencies": {
     "angular": "^1.5.9",
@@ -45,11 +45,11 @@
     "css-loader": "^0.26.1",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.9.0",
+    "html-loader": "^0.4.4",
     "imports-loader": "^0.7.0",
     "kerberos": "0.0.22",
     "node-sass": "^4.0.0",
     "nodemon": "^1.11.0",
-    "raw-loader": "^0.5.1",
     "resolve-url-loader": "^1.6.1",
     "sass-loader": "^4.1.0",
     "style-loader": "^0.13.1",

@@ -35,6 +35,18 @@ router.post('/todos.json', function(req, res, next) {
 // });
 
 router.route('/todos.json/:todo')
+
+  .put(function(req, res){
+    Todo.findById(req.params.todo, function(err, todo){
+      if(err){res.send(err);}
+      todo.text = req.body.text;
+      todo.save(function(err){
+        if(err){res.send(err);}
+        res.send(todo);
+      });
+    });
+  })
+
   .delete(function(req,res){
     Todo.findByIdAndRemove(req.params.todo, function(err, todo){
       if(err){res.send(err);}

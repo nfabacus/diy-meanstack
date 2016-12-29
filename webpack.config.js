@@ -38,7 +38,7 @@ module.exports = {
         },
         {
             test: /\.html$/,
-            loader: 'raw'
+            loader: 'html'
         },
         {
           test: /\.(png|jpg|svg)$/,

@@ -97,18 +97,39 @@ app.factory('toDos', ['$http', function($http){
   o.getAll = function() {
     return $http.get('/todos.json').then(function(res){
       angular.copy(res.data, o.todos);
+      o.todos.forEach(function(todo, index){
+        todo.editMode = false;
+      });
     });
   };
 
-  o.addTodo = function(item){
-    return $http.post('/todos.json', item).then(function(res){
-      console.log("data response from addTodo: ", res.data);
+  o.create = function(todo){
+    return $http.post('/todos.json', todo).then(function(res){
+      console.log("data response from create: ", res.data);
+      res.data.editMode = false;
+      console.log("res.data: ", res.data);
+
+
       o.todos.push(res.data);
     });
   };
 
+  o.update = function(todo){
+    console.log("todo from o.update:", todo);
+    return $http.put('/todos.json/'+ todo._id, todo).then(function(res){
+      console.log("res from update: ", res.data._id);
+
+      o.todos.forEach(function(item, index){
+        if (item._id === res.data._id){
+          item = res.data;
+        }
+      });
+    });
+
+  };
+
   o.delete = function(todo){
-    console.log("deteTodo executed");
+    console.log("deleteTodo executed");
     return $http.delete('/todos.json/' + todo._id).then(function(res){
       console.log("res.data from delete: ", res.data);
 
@@ -134,25 +155,32 @@ app.controller('landingCtrl', function($scope){
 });
 
 app.controller('todoCtrl', ['$scope', 'toDos', function($scope, toDos){
-  // $scope.updateTodos = function(){
-      $scope.todoList = toDos.todos;
-      console.log('todoList updated: ', $scope.todoList);
-  // };
-  // console.log('todoList: ', $scope.todoList);
-  // $scope.updateTodos();
+  $scope.todoList = toDos.todos;
+  console.log("$scope.editMode: ",$scope.editMode);
 
   $scope.submit = function(){
     if(!$scope.todoText){
       return;
     }
     console.log("$scope.todoText: ", $scope.todoText);
-    toDos.addTodo({
+    toDos.create({
       text: $scope.todoText,
       complete: false
     });
-
     $scope.todoText = "";
   };
+
+  $scope.editTodo = function(todo){
+    todo.editMode = true;
+    console.log("$scope.editMode NOW: ", todo.editMode);
+  };
+
+  $scope.saveTodo = function(todo){
+    console.log("todo from saveTodo:", todo);
+    toDos.update(todo);
+    todo.editMode = false;
+  };
+
   $scope.deleteTodo = function(todo){
     toDos.delete(todo);
   };

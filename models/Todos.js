@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var TodoSchema = new mongoose.Schema({
   // _id: Number,
   text: String,
+  // editMode: { type: Boolean, default: false },
   complete: { type: Boolean, default: false }
 });
 //

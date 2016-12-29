@@ -10,5 +10,16 @@
 
 </form>
 <ul class="list-group">
-  <li class="list-group-item" ng-repeat="item in todoList">{{ item.text }} <button type="button" ng-click="deleteTodo(item)" class="btn btn-default btn-sm">Edit</button> <button type="button" ng-click="deleteTodo(item)" class="btn btn-danger btn-sm">X</button></li>
+  <li class="list-group-item" ng-repeat="item in todoList">
+    <!-- if editMode is on -->
+    <input ng-if="item.editMode" type="text" name=""  ng-model="item.text">
+    <!-- if editMode is off -->
+    <span ng-if="!item.editMode">{{ item.text }}</span>
+
+    <button type="button" ng-click="deleteTodo(item)" class="btn btn-danger btn-sm pull-right" >X</button>
+
+    <button ng-if="item.editMode" type="button" ng-click="saveTodo(item)" class="btn btn-default btn-sm pull-right">Save</button>
+
+    <button ng-if="!item.editMode" type="button" ng-click="editTodo(item)" class="btn btn-default btn-sm pull-right">Edit</button>
+  </li>
 </ul>
