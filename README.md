@@ -2,7 +2,7 @@
 
 This application supports the [Getting Started with Node on Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs) article.
 
-
+## Please use MAC for this to run properly.  Issue with windows at the moment.
 
 ## Running server for development
 ```npm run dev```
