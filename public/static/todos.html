@@ -10,7 +10,7 @@
 
 </form>
 <ul class="list-group">
-  <li class="list-group-item" ng-repeat="item in todoList">
+  <li class="list-group-item todo-item" ng-repeat="item in todoList">
     <!-- if editMode is on -->
     <input ng-if="item.editMode" type="text" name=""  ng-model="item.text">
     <!-- if editMode is off -->
