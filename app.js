@@ -10,7 +10,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 // We need to require monoose models here.
 require('./models/Todos.js');
-mongoose.connect('mongodb://localhost/diy-meanstack');
+mongoose.connect(process.env.database);
 
 
 var expressValidator = require('express-validator');
