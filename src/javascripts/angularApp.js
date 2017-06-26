@@ -155,6 +155,7 @@ app.controller('landingCtrl', function($scope){
 });
 
 app.controller('todoCtrl', ['$scope', 'toDos', function($scope, toDos){
+  $scope.parent.addClass = "";
   $scope.todoList = toDos.todos;
   console.log("$scope.editMode: ",$scope.editMode);
 
