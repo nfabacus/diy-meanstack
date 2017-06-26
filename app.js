@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 // We need to require monoose models here.
 require('./models/Todos.js');
+require('dotenv').config();
 mongoose.connect(process.env.database);
 
 
